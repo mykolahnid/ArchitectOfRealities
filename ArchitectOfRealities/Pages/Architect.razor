@@ -1,0 +1,34 @@
+@page "/architect"
+@inject IJSRuntime JS
+
+<PageTitle>Architect of Realities</PageTitle>
+
+<div class="architect-wrap">
+    <canvas id="architect-canvas"></canvas>
+    <div class="overlay">
+        <h1>The Architect of Realities</h1>
+        <p>Code shapes matter. Math bends fate.</p>
+    </div>
+</div>
+
+@code {
+    private IJSObjectReference? _mod;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _mod = await JS.InvokeAsync<IJSObjectReference>("import", "/js/architect.js");
+            await _mod.InvokeVoidAsync("architect.start", "#architect-canvas");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_mod is not null)
+        {
+            await _mod.InvokeVoidAsync("architect.stop");
+            await _mod.DisposeAsync();
+        }
+    }
+}
